@@ -1,0 +1,37 @@
+package com.lv.retrofit.proxy.interceptor
+
+import okhttp3.Interceptor
+import okhttp3.MediaType
+import okhttp3.Response
+import okhttp3.ResponseBody
+import org.json.JSONObject
+
+/**
+ * Date: 2017-06-21
+ * Time: 15:30
+ * Description:
+ */
+class ProtocolInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain?): Response {
+        chain ?: throw RuntimeException("this Interceptor.Chain is empty")
+        val response = chain.proceed(chain.request())
+        val medizType = MediaType.parse("application/json; chartset='utf-8'")
+        val data = parseDataFromBody(response.body()?.string())
+        return response.newBuilder().body(ResponseBody.create(medizType, data)).build()
+    }
+
+    private fun parseDataFromBody(body: String?): String {
+        var error: String? = null
+        try {
+            val json = JSONObject(body)
+            val code = json.optInt("code", 0)
+            if (code == 200)
+                return json.optString("data")
+            error = json.optString("msg")
+            throw RuntimeException(error)
+        } catch (e: Exception) {
+            throw  RuntimeException(error ?: "数据解析错误,请稍后重试!")
+        }
+    }
+
+}
