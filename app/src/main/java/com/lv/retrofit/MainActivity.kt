@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.lv.retrofit.api.UserApi
-import com.lv.retrofit.model.UserInfo
+import com.lv.retrofit.model.UpdateBean
+import com.lv.retrofit.model.User
 import com.lv.retrofit.proxy.ImitationRetrofit
 import com.lv.retrofit.proxy.interceptor.ProtocolInterceptor
 import com.wumart.warehouse.util.io_main
@@ -25,19 +26,14 @@ class MainActivity : AppCompatActivity() {
                 .writeTimeout(20, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(false)
         val userApi = ImitationRetrofit.Builder()
-                .baseUrl("http://10.12.194.171:8080/")
+                .baseUrl("http://10.13.3.19:16000/wmapp-server/")
                 .httpClient(builder.build())
                 .build()
                 .create(UserApi::class.java)
-        userApi.getVerifycode("15202842963")
-                .flatMap {
-                    it.put("phone","15202842963")
-                    it.put("passWord","123456")
-                    userApi.login(it)
-                }
+        userApi.user(User(1,"asdf"))
                 .io_main()
-                .subscribe(object : Subscriber<UserInfo>(){
-                    override fun onNext(t: UserInfo?) {
+                .subscribe(object : Subscriber<UpdateBean>(){
+                    override fun onNext(t: UpdateBean?) {
                         Toast.makeText(this@MainActivity,"成功了",Toast.LENGTH_SHORT).show()
                         DLog.d(t)
                     }

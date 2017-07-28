@@ -40,19 +40,19 @@ class HttpCall<out T>(
         }
     }
 
-    private fun getHttpParam(argumentCount: Int): Map<String, Any> {
+    private fun getHttpParam(argumentCount: Int): Any {
         val params = ArrayMap<String, Any>()
         if (serviceMethod.isHttpGet()) {
             for (index in 0 until argumentCount)
                 params.put(serviceMethod.getQueryKey(index), arge?.get(index))
             return params
-        } else if (arge?.get(0) != null && arge[0] is Map<*, *>) {
-            return arge[0] as Map<String, Any>
+        } else if (arge?.get(0) != null) {
+            return arge[0]
         }
         return params
     }
 
-    private fun httpCall(path: String, params: Map<String, Any>): String {
+    private fun httpCall(path: String, params: Any): String {
         val builder = Request.Builder().url(requestUrl(path, params))
         if (!serviceMethod.isHttpGet())
             builder.post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), Gson().toJson(params)))
@@ -67,10 +67,10 @@ class HttpCall<out T>(
      * *
      * @param paramsMap   请求参数
      */
-    private fun requestUrl(actionUrl: String, paramsMap: Map<String, Any>): String {
+    private fun requestUrl(actionUrl: String, paramsMap: Any): String {
         val tempParams = StringBuilder()
         try {
-            if (serviceMethod.isHttpGet()) {
+            if (serviceMethod.isHttpGet()&& paramsMap is Map<*,*>) {
                 //处理参数
                 for ((pos, key) in paramsMap.keys.withIndex()) {
                     if (pos > 0) {

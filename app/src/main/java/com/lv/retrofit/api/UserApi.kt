@@ -28,4 +28,7 @@ interface UserApi {
 
     @POST("login/login")
     fun login(@Body param: Map<String, String>): Observable<UserInfo>
+
+    @POST("app/getNewest")
+    fun user(@Body user: User): Observable<UpdateBean>
 }
